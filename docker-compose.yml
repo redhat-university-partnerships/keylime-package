@@ -1,5 +1,15 @@
 version: '3.6'
 services:
+  keylime-tenant:
+    build:
+      context: ./docker/fedora
+      dockerfile: keylime_py.Dockerfile
+    image: keylime_py
+    hostname: 'keylime-tenant'
+    user: root
+    ports: 
+      - "8870:8870" # chosen at random
+    command: "keylime_tenant -c add -t 0.0.0.0 -v 0.0.0.0 -u D432FBB3-D2F1-4A97-9EF7-75BD81C00000 -f /keylime/script.sh"
   keylime-verifier:
     build:
       context: ./docker/fedora/
