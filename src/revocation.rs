@@ -16,6 +16,7 @@ use std::process::{Child, Command, Output, Stdio};
 
 use openssl::pkey::PKey;
 use serde_json::Value;
+use zeromq::{SocketRecv, Socket};
 
 /// Runs a script with a json value as argument (used for revocation actions)
 pub(crate) fn run_action(
@@ -125,10 +126,7 @@ pub(crate) async fn run_revocation_service() -> Result<()> {
         format!("{}/unzipped/RevocationNotifier-cert.crt", mount);
 
     // Connect to the service via 0mq
-    let context = zmq::Context::new();
-    let mysock = context.socket(zmq::SUB)?;
-
-    mysock.set_subscribe(b"")?;
+    let mut mysock = zeromq::SubSocket::new();
 
     let revocation_ip = config_get("general", "receive_revocation_ip")?;
     let revocation_port = config_get("general", "receive_revocation_port")?;
@@ -136,7 +134,8 @@ pub(crate) async fn run_revocation_service() -> Result<()> {
 
     info!("Connecting to revocation endpoint at {}...", endpoint);
 
-    mysock.connect(endpoint.as_str())?;
+    mysock.connect(endpoint.as_str()).await?;
+    mysock.subscribe("").await?;
 
     // Unlike the python agent we do not attempt lazy loading. We either
     // have the certificate, or we don't. If we don't have a key or can't load
@@ -170,21 +169,24 @@ pub(crate) async fn run_revocation_service() -> Result<()> {
     // Main revocation service loop. If a message is malformed or
     // can not be verified the loop continues.
     loop {
-        let mut rawbody = match mysock.recv_string(0) {
-            Ok(v) => match v {
-                Ok(v) => v,
-                _ => {
-                    warn!("Unable to read message from 0mq");
-                    continue;
-                }
-            },
+        let mut rawbody = match mysock.recv().await {
+            Ok(v) => v,
             Err(e) => {
                 warn!("Unable to read message from 0mq");
                 continue;
             }
         };
 
-        let body: Value = serde_json::from_str(rawbody.as_str())?;
+        let bytes = match rawbody.get(0) {
+            Some(v) => v,
+            None => {
+                warn!("Unable to read message frame from 0mq");
+                continue;
+            }
+        };
+
+        let json = String::from_utf8(bytes.as_ref().to_vec())?;
+        let body: Value = serde_json::from_str(&json)?;
 
         // Ensure we have a signature, otherwise continue the loop
         let signature = match body["signature"].as_str() {

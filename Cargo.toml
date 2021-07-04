@@ -8,7 +8,7 @@ description = "Rust agent for Keylime"
 repository = "https://github.com/keylime/rust-keylime"
 
 [dependencies]
-actix-web = "3"
+actix-web = "4.0.0-beta.8"
 base64 = "0.12"
 flate2 = "1.0.4"
 futures = "0.3.6"
@@ -17,18 +17,17 @@ libc = "0.2.43"
 log = "0.4"
 openssl = "0.10.15"
 pretty_env_logger = "0.2.0"
-reqwest = {version = "0.10.8", features = ["json"]}
+reqwest = {version = "0.11.4", features = ["json"]}
 rust-ini = "0.12.1"
 rustc-serialize = "0.3.24"
 serde = "1.0.80"
 serde_derive = "1.0.80"
 serde_json = { version = "1.0", features = ["raw_value"] }
 tempfile = "3.0.4"
-tokio = {version = "0.2", features = ["full"]}
-tokio-io = "0.1"
+tokio = {version = "1", features = ["full"]}
 tss-esapi = "5.0"
 thiserror = "1.0"
-zmq = "0.9.2"
+zeromq = { git = "https://github.com/zeromq/zmq.rs.git", rev = "68e468a88c5b8aa8ac2190d86931622e494db96d" }
 uuid = {version = "0.8", features = ["v4"]}
 wiremock = "0.5"
 

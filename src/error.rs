@@ -52,7 +52,7 @@ pub(crate) enum Error {
     #[error("Crypto error: {0}")]
     Crypto(#[from] openssl::error::ErrorStack),
     #[error("ZMQ error: {0}")]
-    Zmq(#[from] zmq::Error),
+    Zmq(#[from] zeromq::ZmqError),
     #[error("{0}")]
     Other(String),
 }
