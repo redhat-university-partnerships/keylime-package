@@ -7,3 +7,6 @@ RUN dnf install -y \
 	llvm llvm-devel clang pkg-config \
 	dbus-daemon czmq-devel \
 	python3
+
+RUN cargo install cargo-tarpaulin
+

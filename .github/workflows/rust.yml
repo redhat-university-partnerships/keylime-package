@@ -28,4 +28,10 @@ jobs:
     - name: Build the container
       run: docker build -t testimage tests/
     - name: Run the container
-      run: docker run -v $(pwd):/tmp/code_under_test -w /tmp/code_under_test testimage dbus-run-session -- /tmp/code_under_test/tests/run.sh
+      run: docker run --security-opt seccomp=tests/seccomp-profile.json -v $(pwd):/tmp/code_under_test -w /tmp/code_under_test testimage dbus-run-session -- /tmp/code_under_test/tests/run.sh
+    - uses: actions/upload-artifact@v2
+      with:
+        name: tarpaulin-report
+        path: |
+          tarpaulin-report.json
+          tarpaulin-report.html
