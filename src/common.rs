@@ -109,91 +109,47 @@ pub(crate) fn config_file_get() -> String {
 
 /// Returns revocation ip from keylime.conf if env var not present
 pub(crate) fn revocation_ip_get() -> Result<String> {
-    match env::var("REVOCATION_IP") {
-        Ok(ip) => {
-            // The variable length must be larger than 0 to accept
-            if !ip.is_empty() {
-                Ok(ip)
-            } else {
-                config_get("general", "receive_revocation_ip")
-            }
-        }
-        _ => config_get("general", "receive_revocation_ip"),
-    }
+    config_get_env("general", "receive_revocation_ip", "REVOCATION_IP")
 }
 
 /// Returns revocation port from keylime.conf if env var not present
 pub(crate) fn revocation_port_get() -> Result<String> {
-    match env::var("REVOCATION_PORT") {
-        Ok(ip) => {
-            // The variable length must be larger than 0 to accept
-            if !ip.is_empty() {
-                Ok(ip)
-            } else {
-                config_get("general", "receive_revocation_port")
-            }
-        }
-        _ => config_get("general", "receive_revocation_port"),
-    }
+    config_get_env("general", "receive_revocation_port", "REVOCATION_PORT")
 }
 
 /// Returns cloud agent IP from keylime.conf if env var not present
 pub(crate) fn cloudagent_ip_get() -> Result<String> {
-    match env::var("CLOUDAGENT_IP") {
-        Ok(ip) => {
-            // The variable length must be larger than 0 to accept
-            if !ip.is_empty() {
-                Ok(ip)
-            } else {
-                config_get("cloud_agent", "cloudagent_ip")
-            }
-        }
-        _ => config_get("cloud_agent", "cloudagent_ip"),
-    }
+    config_get_env("cloud_agent", "cloudagent_ip", "CLOUDAGENT_IP")
 }
 
 /// Returns cloud agent port from keylime.conf if env var not present
 pub(crate) fn cloudagent_port_get() -> Result<String> {
-    match env::var("CLOUDAGENT_PORT") {
-        Ok(ip) => {
-            // The variable length must be larger than 0 to accept
-            if !ip.is_empty() {
-                Ok(ip)
-            } else {
-                config_get("cloud_agent", "cloudagent_port")
-            }
-        }
-        _ => config_get("cloud_agent", "cloudagent_port"),
-    }
+    config_get_env("cloud_agent", "cloudagent_port", "CLOUDAGENT_PORT")
 }
 
 /// Returns registrar IP from keylime.conf if env var not present
 pub(crate) fn registrar_ip_get() -> Result<String> {
-    match env::var("REGISTRAR_IP") {
-        Ok(ip) => {
-            // The variable length must be larger than 0 to accept
-            if !ip.is_empty() {
-                Ok(ip)
-            } else {
-                config_get("registrar", "registrar_ip")
-            }
-        }
-        _ => config_get("registrar", "registrar_ip"),
-    }
+    config_get_env("registrar", "registrar_ip", "REGISTRAR_IP")
 }
 
 /// Returns registrar port from keylime.conf if env var not present
 pub(crate) fn registrar_port_get() -> Result<String> {
-    match env::var("REGISTRAR_PORT") {
-        Ok(ip) => {
-            // The variable length must be larger than 0 to accept
-            if !ip.is_empty() {
-                Ok(ip)
-            } else {
-                config_get("registrar", "registrar_port")
-            }
-        }
-        _ => config_get("registrar", "registrar_port"),
+    config_get_env("registrar", "registrar_port", "REGISTRAR_PORT")
+}
+
+/// Returns the contact ip for the agent if set
+pub(crate) fn cloudagent_contact_ip_get() -> Option<String> {
+    match config_get_env("cloud_agent", "agent_contact_ip", "KEYLIME_AGENT_CONTACT_IP") {
+        Ok(ip) => Some(ip),
+        Err(_) => None // Ignore errors because this option might not be set
+    }
+}
+
+/// Returns the contact ip for the agent if set
+pub(crate) fn cloudagent_contact_port_get() -> Option<u32> {
+    match config_get_env("cloud_agent", "agent_contact_port", "KEYLIME_AGENT_CONTACT_PORT") {
+        Ok(port) => Some(port.parse::<u32>().unwrap()),
+        _ => None // Ignore errors because this option might not be set
     }
 }
 
@@ -231,6 +187,27 @@ pub(crate) fn config_get(section: &str, key: &str) -> Result<String> {
     };
 
     Ok(value.clone())
+}
+
+/*
+ * Input: [section] and key and environment variable
+ * Return: Returns the matched key
+ *
+ * Example call:
+ * let port = common::config_get_env("general","cloudagent_port", "CLOUDAGENT_PORT");
+ */
+pub(crate) fn config_get_env(section: &str, key: &str, env: &str) -> Result<String> {
+    match env::var(env) {
+        Ok(ip) => {
+            // The variable length must be larger than 0 to accept
+            if !ip.is_empty() {
+                Ok(ip)
+            } else {
+                config_get(section, key)
+            }
+        }
+        _ => config_get(section, key),
+    }
 }
 
 /*
