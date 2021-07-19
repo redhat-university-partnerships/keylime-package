@@ -289,6 +289,8 @@ async fn main() -> Result<()> {
     let registrar_port = registrar_port_get()?;
     let agent_uuid_config = config_get("cloud_agent", "agent_uuid")?;
     let agent_uuid = get_uuid(&agent_uuid_config);
+    let cloudagent_contact_ip = cloudagent_contact_ip_get();
+    let cloudagent_contact_port = cloudagent_contact_port_get();
     info!("Agent UUID: {}", agent_uuid);
 
     {
@@ -300,6 +302,8 @@ async fn main() -> Result<()> {
             &ek_tpm2b_pub,
             ek_cert,
             &ak_tpm2b_pub,
+            cloudagent_contact_ip,
+            cloudagent_contact_port
         )
         .await?;
         info!("SUCCESS: Agent {} registered", agent_uuid);
