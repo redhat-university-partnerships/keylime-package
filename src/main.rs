@@ -359,20 +359,20 @@ async fn main() -> Result<()> {
         App::new()
             .app_data(quotedata.clone())
             .service(
-                web::resource("/keys/ukey")
+                web::resource(format!("/{}/keys/ukey", API_VERSION))
                     .route(web::post().to(keys_handler::u_or_v_key)),
             )
             .service(
                 // the double slash may be a typo on the python side
-                web::resource("//keys/vkey")
+                web::resource(format!("/{}/keys/vkey", API_VERSION))
                     .route(web::post().to(keys_handler::u_or_v_key)),
             )
             .service(
-                web::resource("/quotes/identity")
+                web::resource(format!("/{}/quotes/identity", API_VERSION))
                     .route(web::get().to(quotes_handler::identity)),
             )
             .service(
-                web::resource("/quotes/integrity")
+                web::resource(format!("/{}/quotes/integrity", API_VERSION))
                     .route(web::get().to(quotes_handler::integrity)),
             )
     })
