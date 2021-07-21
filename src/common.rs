@@ -9,6 +9,7 @@ use std::env;
 /*
  * Constants and static variables
  */
+pub const API_VERSION: &str = "v1.0";
 pub const STUB_VTPM: bool = false;
 pub const STUB_IMA: bool = true;
 pub const TPM_DATA_PCR: usize = 16;

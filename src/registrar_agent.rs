@@ -103,8 +103,8 @@ pub(crate) async fn do_activate_agent(
 
     #[cfg(not(test))]
     let addr = format!(
-        "http://{}:{}/agents/{}",
-        registrar_ip, registrar_port, agent_uuid
+        "http://{}:{}/{}/agents/{}",
+        registrar_ip, registrar_port, API_VERSION, agent_uuid
     );
 
     info!(
@@ -146,8 +146,8 @@ pub(crate) async fn do_register_agent(
 
     #[cfg(not(test))]
     let addr = format!(
-        "http://{}:{}/agents/{}",
-        registrar_ip, registrar_port, agent_uuid
+        "http://{}:{}/{}/agents/{}",
+        registrar_ip, registrar_port, API_VERSION, agent_uuid
     );
 
     info!(
